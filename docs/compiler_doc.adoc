@@ -9,7 +9,7 @@ Umar Karimabadi
 :revremark: First Edition                                                                                                                                                        
 :revnumber: 1.0   
 
-:youtube_video_title: "Compiler Internals : Type Checking, First Class Functions, Virtual Threads, Garbage Collection and Non Blocking I/O"                                                                                                                            
+:youtube_video_title: "Understanding Compilers and Runtimes - Type Checking, Generics, Virtual Threads, Garbage Collection"                                                                                                                            
 
 :imagesdir: ./images
 
