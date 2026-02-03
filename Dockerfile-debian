@@ -1,0 +1,12 @@
+FROM debian:bookworm
+
+WORKDIR /app
+
+RUN apt-get update --fix-missing && \
+    apt-get install -y cmake g++ gdb python3 && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV CXX=g++
+ENV CC=gcc
+
+CMD /bin/bash

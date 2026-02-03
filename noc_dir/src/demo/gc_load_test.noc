@@ -1,0 +1,19 @@
+import "src/error.noc"
+import "src/gc_utils.noc"
+
+// Pinnging issued fixed but this is an excellent benchmakr
+// Fib::30 take a couple seconds to achieve; deifinitely because heap is kept being allocate from OS 
+// Increasing heap size does not improve things; most likely because heap is not paged in 
+function int fibRecursive(int n) {
+    if (n <= 1) {
+        return n;
+    }
+    return fibRecursive(n - 1) + fibRecursive(n - 2);
+}
+
+function fib_gc_load_test(int max_fib_sequence) {
+    for (i = 0; i < max_fib_sequence; i++) {
+        result = fibRecursive(i);
+        printf("fib[%d] is %d\n", i, result);
+    }
+}

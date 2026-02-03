@@ -1,0 +1,8 @@
+import "src/demo/integration_tests.noc"
+
+function main() throws  {    
+    run_all_test_cases();
+}
+
+
+

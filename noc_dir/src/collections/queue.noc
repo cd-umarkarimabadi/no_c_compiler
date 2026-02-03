@@ -1,0 +1,26 @@
+import "src/collections/linked_list.noc"
+
+struct queue<T> {
+    linked_list<T> list;
+}
+
+function init_queue(queue<T> queue) {
+    queue.list = new linked_list<T>();
+    init_linked_list(queue.list);
+}
+
+function enqueue(queue<T> queue, T element) {
+    append_tail(queue.list, element);
+}
+
+function bool is_queue_empty(queue<T> queue) {
+    return is_linked_list_empty(queue.list);
+}
+
+function T dequeue(queue<T> queue) {
+    if (is_linked_list_empty(queue.list)) {
+        return null;
+    }
+    to_return = remove_head(queue.list);
+    return to_return;
+}

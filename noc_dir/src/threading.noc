@@ -1,0 +1,51 @@
+// Threading 
+import "src/collections/array_list.noc"
+import "src/gc_utils.noc"
+
+struct future<T> {
+    T result;
+}
+// Placeholder for internal structure 
+struct mutex {
+}
+
+external function T await(future<T> f) throws;
+external function mutex create_mutex();
+external function lock(mutex m);
+external function bool try_lock(mutex m);
+external function unlock(mutex m);
+external function int get_vthreadid();
+external function sleep(int seconds);
+
+typedef function runnable_func :: () -> void;
+
+function await_runnable(runnable_func func) throws {
+    future = no function(runnable_func func) {
+        func();
+    }    
+    try await(future);
+}
+
+function await_all(array_list<runnable_func> runnables) throws {
+    num_runnables = size_of_array_list(runnables);
+    if (num_runnables == 0) {
+        return;
+    }
+    future_len = num_runnables;;
+    futures = new future<void>[future_len];
+    for (i=0; i<num_runnables; i++) {
+        runnable = try array_list_at(runnables, i);
+        future = no function(runnable_func runnable) {
+            runnable();
+        }   
+        futures[i] = future;
+    }
+
+    for (i=0; i<futures.len; i++) {
+        future = futures[i];
+        try await(future);
+    }
+
+    printf("running on vthread id %d\n", get_vthreadid());
+    printf("Done\n");
+}

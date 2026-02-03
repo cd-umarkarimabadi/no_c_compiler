@@ -1,0 +1,30 @@
+struct socket {
+}
+
+external function socket create_socket() throws;
+external function connect_socket(socket socket, string address, int port) throws;
+
+// Read and write socket can both read/write partial data 
+external function byte[] read_socket(socket socket, int bytes_to_read) throws;
+external function int write_socket_base(socket socket, byte[] data, int offset) throws;
+external function close_socket(socket socket);
+
+function write_socket(socket socket, byte[] data) throws {
+    bytes_to_transfer = data.len;
+    offset = 0;
+    for {
+        bytes_written = try write_socket_base(socket, data, offset);
+        bytes_to_transfer = bytes_to_transfer - bytes_written;
+        if (bytes_to_transfer == 0) {
+            break;
+        }
+        offset = offset + bytes_written;
+    }
+}
+
+struct server_socket {
+
+}
+
+external function server_socket create_server_socket(int port) throws;
+external function socket accept(server_socket socket) throws;

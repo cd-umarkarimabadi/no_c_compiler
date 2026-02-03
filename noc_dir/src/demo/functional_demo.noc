@@ -1,0 +1,141 @@
+
+import "src/collections/arr_utils.noc"
+
+typedef function return_int :: () -> int;
+function function_scope_demo() {
+    x = 2;
+
+    function return_int local() {
+        function int inner() {
+            return x;
+        }
+        return inner;
+    }
+
+    z = local;
+    t = z();
+    result = t();
+    printf("Result shoudl be 2 got %d\n", result);
+}
+
+typedef function void_func :: () -> void;
+
+struct counter_object {
+    void_func increment;
+    void_func decrement;
+    void_func print_x;
+}
+
+function counter_object create_counter_closure() {
+    counter = 1;
+
+    function increment_counter() {
+        counter++;
+    }
+
+    function decrement_counter() {
+        counter--;
+    }
+
+    function print_x() {
+        printf("The value of x is %d\n", counter);
+    }
+
+    counter_obj = new counter_object();
+    counter_obj.increment = increment_counter;
+    counter_obj.decrement = decrement_counter;
+    counter_obj.print_x = print_x;
+    return counter_obj;
+}
+
+function counter_closure_demo() {
+    counter = create_counter_closure();
+    counter_two = create_counter_closure();
+
+    inc_fun = counter.increment;
+    dec_fun = counter.decrement;
+    print_fun = counter.print_x;
+
+    print_fun_two = counter_two.print_x;
+
+    inc_fun();
+    inc_fun();
+    inc_fun();
+    dec_fun();
+
+    printf("The value of x should be %d\n", 3);
+    print_fun();
+
+    printf("The value of x should be %d\n", 1);
+    print_fun_two();
+}
+
+typedef function transform_int_func :: (int) -> int;
+
+function int double_int(int x) {
+    return x *2;
+}
+
+function transform_int_func create_mapping_function() {
+    return double_int;
+}
+
+function functional_map_demo() {
+
+    x = new int[5];
+
+    for (i = 1; i <= x.len; i++) {
+        x[i - 1] = i;
+    }
+
+    output = map(x, double_int);
+    
+    printf("result should be\narr[0] 2, arr[1] 4, arr[2] 6, arr[3] 8, arr[4] 10\n");
+    printf("got \n");
+    print_arr(output);
+}
+
+function functions_in_arr_demo() {
+    arr_func = new transform_int_func[2];
+
+    arr_func[0] = double_int;
+    arr_func[1] = double_int;
+
+    result = 1;
+    for (i =0 ; i<arr_func.len; i++) {
+        func = arr_func[0];
+        result = func(result);
+    }
+    printf("result should be 4 got %d", result);
+}
+
+
+function anon_function_demo() {
+    x = new int[5];
+
+    for (i = 1; i <= x.len; i++) {
+        x[i - 1] = i;
+    }
+
+    output = map(x, function(int x) int {
+        printf("x is %d\n", x);
+        return x * 2;
+    });
+
+    print_arr(output);
+}
+
+
+function run_functional_demo_test() {
+    printf("\n functional map demo \n");
+    functional_map_demo();
+    printf("\n functional scope demo \n");
+    function_scope_demo();    
+    printf("\n counter closure demo \n");
+    counter_closure_demo();
+    printf("\n functions in arr demo \n");
+    functions_in_arr_demo();
+
+    printf("\n anon function demo \n");
+    anon_function_demo();
+}

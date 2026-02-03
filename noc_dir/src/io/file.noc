@@ -1,0 +1,7 @@
+struct file_handle {
+}
+
+external function file_handle open_file(string file_name, string modes) throws;
+external function byte[] read_file(file_handle handle, int bytes_to_read) throws;
+external function write_file(file_handle handle, byte[] data) throws;
+external function close_file(file_handle handle);

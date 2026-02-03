@@ -1,0 +1,40 @@
+import "src/demo/traversal.noc"
+import "src/collections/stack.noc"
+
+struct tree_inorder_iterator<T> {
+    stack<TreeNode<T>> iteration;
+}
+
+function init_iterator(tree_inorder_iterator<T> iterator, TreeNode<T> root) {
+    
+    iterator.iteration = new stack<TreeNode<T>>();
+    init_stack(iterator.iteration);
+    push(iterator.iteration, root);
+    traverse_left(iterator);
+}
+
+
+function traverse_left(tree_inorder_iterator<T> iterator) {
+    for {
+        top = peek(iterator.iteration);
+        if (top.left != null) {
+            push(iterator.iteration, top.left);
+        } else {
+            break;
+        }
+    }
+}
+
+function bool has_next(tree_inorder_iterator<T> iterator) {
+    return is_empty(iterator.iteration) == false;
+}
+
+function T next(tree_inorder_iterator<T> iterator) {
+    top = pop(iterator.iteration);
+    
+    if (top.right != null) {
+        push(iterator.iteration, top.right);
+        traverse_left(iterator); 
+    }
+    return top.value;
+}

@@ -1,0 +1,82 @@
+struct node<T> {
+    T value;
+    node<T> next;
+    node<T> prev;
+}
+
+struct linked_list<T> {
+    node<T> head;
+    node<T> tail;
+}
+
+function init_linked_list(linked_list<T> list) {
+    list.head = new node<T>();
+    list.tail = list.head;
+}
+
+function print_linked_list(linked_list<T> val) {
+    current = val.head.next;
+    printf("[");
+    for {
+        if (current != null) {
+            printf("%d", current.value);
+            current = current.next;
+            if (current != null) {
+                printf(", ");
+            }
+        } else {
+            break;
+        }
+    }
+    printf("]\n");
+}
+
+function append_tail(linked_list<T> list, T value) {
+    current_tail = list.tail;
+    new_tail = new node<T>();
+    new_tail.prev = current_tail;
+    new_tail.value = value;
+    list.tail.next = new_tail;
+    list.tail = new_tail;
+}
+
+function bool is_linked_list_empty(linked_list<T> list) {
+    if (list.head == list.tail) {
+        return true;
+    }
+    return false;
+}
+
+function node<T> get_head(linked_list<T> list) {
+    if (list.head == list.tail) {
+        return null;
+    }
+    return list.head.next;
+}
+
+function T remove_head(linked_list<T> list) {
+    if (list.head != list.tail) {
+        to_return = list.head.next.value;
+        list.head = list.head.next;
+        return to_return;
+    } 
+    return null;
+}
+
+function remove_tail(linked_list<T> list) {
+    if (list.tail == list.head) {
+        return;
+    }
+    current_tail = list.tail;
+    list.tail = current_tail.prev;
+    list.tail.next = null; 
+}
+
+function erase(linked_list<T> list) {
+    for {
+        if (list.tail == list.head) {
+            return;
+        }
+        remove_tail(list);
+    }
+}

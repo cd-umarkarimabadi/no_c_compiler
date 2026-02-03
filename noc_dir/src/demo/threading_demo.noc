@@ -1,0 +1,141 @@
+import "src/threading.noc"
+import "src/gc_utils.noc"
+import "src/demo/gc_load_test.noc"
+
+function int some_other_result() {
+    return 1;
+}
+
+function long_running_thread() throws {
+    printf("Running long running thread %d\n", get_vthreadid());
+    result_future = no function() int {
+        for {
+            printf("Running long running thread %d\n", get_vthreadid());            
+            sleep(2);
+            printf("Thread %d is awake\n", get_vthreadid());
+            break;
+        }
+        return 1;
+    }
+    printf("Thread %d is awake\n", get_vthreadid());
+    num = try await(result_future);
+    printf("The number is %d\n", num);
+}
+
+function threading_demo_test() throws  {
+    try long_running_thread();
+    printf("done running long_running_thread\n");
+}
+
+function thread_scoping_demo() throws {
+
+   runnables = new array_list<runnable_func>();
+   init_array_list(runnables);
+
+   array_list_add(runnables, function() {
+       printf("runnable 1 on v thread %d\n", get_vthreadid());
+       printf("runnable 1 is finished\n");
+   });  
+
+   array_list_add(runnables, function() {
+       printf("runnable 2 on v thread %d\n", get_vthreadid());
+       printf("runnable 2 is finished\n");
+   });  
+
+   try await_all(runnables);
+}
+
+function thread_scope_with_gc() throws {
+    for (i = 0; i<100; i++) {
+        printf("Running scope demo iteration at %d\n", i);
+        try thread_scoping_demo();
+        gc_collect(GC_LOG_LEVEL.VERBOSE);
+   }
+}
+
+function thread_awaitable_with_reuse() throws {
+
+    try await_runnable(function() {
+        printf("Running on vthread id %d\n", get_vthreadid());
+        fib_gc_load_test(30);
+   });
+
+   gc_collect(GC_LOG_LEVEL.VERBOSE);
+   
+   try await_runnable(function() {
+        printf("Running on vthread id %d\n", get_vthreadid());
+        fib_gc_load_test(30);
+   });
+}
+
+
+function mutex_rentrant_thread_demo() throws {
+
+    mutex = create_mutex();
+    future_one = no function(mutex mutex) {
+        printf("trying to locking in vthread id %d, %d\n", get_vthreadid(), 1);
+        lock(mutex);
+        printf("Running in vthread id %d\n", get_vthreadid());
+        sleep(5);
+
+        printf("Running in vthread id %d\n", get_vthreadid());
+
+        unlock(mutex);
+        printf("unlocked %d, %d\n", get_vthreadid(), 2);
+    }
+
+    future_two = no function(mutex mutex) {
+        printf("trying to locking in vthread id %d, %d\n", get_vthreadid(), 2);
+        lock(mutex);
+        printf("Running in vthread id %d\n", get_vthreadid());
+        sleep(5);
+        unlock(mutex);
+        printf("unlocked %d, %d\n", get_vthreadid(), 2);
+    }
+
+    try await(future_one);
+    try await(future_two);
+    printf("Done\n");
+}
+
+struct BoxedInt {
+    int result;
+}
+
+function add(BoxedInt boxed, int value) {
+    boxed.result = boxed.result + value;
+}
+
+function locking_demo_with_no_routines() throws {
+
+    mutex = create_mutex();
+    boxed_int = new BoxedInt();
+
+    future_one = no function(mutex mutex, BoxedInt boxed_int) {
+        lock(mutex);
+        defer unlock(mutex);
+
+        for (i=0; i<10000; i++) {
+            add(boxed_int, 1);
+        }
+    }
+
+    future_two = no function(mutex mutex, BoxedInt boxed_int) {
+        lock(mutex);
+        defer unlock(mutex);
+
+        for (i=0; i<10000; i++) {
+            add(boxed_int, 1);
+        }
+    }
+
+    try await(future_one);
+    try await(future_two);
+
+    if (boxed_int.result != 20000) {
+        throw error("boxed_int does not equal to 20000");
+    }
+
+    printf("Result should be 20000 got %d\n", boxed_int.result);
+}
+

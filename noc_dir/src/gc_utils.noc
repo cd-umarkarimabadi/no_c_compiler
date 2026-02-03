@@ -1,0 +1,8 @@
+
+enum GC_LOG_LEVEL {
+    VERBOSE,
+    NONE,
+}
+
+external function gc_collect(GC_LOG_LEVEL loglevel);
+external function gc_stats();

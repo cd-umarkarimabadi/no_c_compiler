@@ -1,0 +1,235 @@
+import "src/demo/leet_code.noc"
+import "src/demo/collection_demo.noc"
+import "src/demo/tree_iterator.noc"
+import "src/demo/functional_demo.noc"
+import "src/gc_utils.noc"
+import "src/demo/threading_demo.noc"
+
+typedef function run_test_func :: () -> void;
+
+struct test_case {
+    string name;
+    run_test_func test_case_fn;
+}
+
+function test_case_add(array_list<test_case> test_cases, 
+                      string test_case_name, 
+                      run_test_func test_case_func) {
+
+    test_case = new test_case();
+    test_case.name = test_case_name;
+    test_case.test_case_fn = test_case_func;
+    array_list_add(test_cases, test_case);
+}
+
+function gc_collect_verbose() {
+    gc_collect(GC_LOG_LEVEL.VERBOSE);
+}
+
+function run_all_test_cases() {
+
+    function run_all_test_cases_inner() throws {
+
+        test_cases = new array_list<test_case>();
+        init_array_list(test_cases);
+
+        test_case_add(test_cases, "run_collection_demo", run_collection_demo);
+        test_case_add(test_cases, "run_tree_traversal", run_tree_traversal_print);
+        test_case_add(test_cases, "test_multi_dimension", test_multi_dimension);
+        test_case_add(test_cases, "run collection demo", run_collection_demo);
+        test_case_add(test_cases, "push_min_stack_test",  push_min_stack_test);
+        test_case_add(test_cases, "tree node iterator", tree_node_iterator);
+        test_case_add(test_cases, "run functional demo", run_functional_demo_test);
+        test_case_add(test_cases, "eval reverse polish test", eval_reverse_polish_test); // throws is not part of fn so so call with try catch will never be called
+        test_case_add(test_cases, "thread awaitable", thread_awaitable_with_reuse); // throws is not part of fn so so call with try catch will never be called
+        test_case_add(test_cases, "Running GC",  gc_collect_verbose);
+        test_case_add(test_cases, "Locking demo",  locking_demo_with_no_routines);
+
+        num_test_cases = size_of_array_list(test_cases);
+
+        for (i=0; i<num_test_cases; i++) {
+            test_case = try array_list_at(test_cases, i);
+            printf("Running Test %s\n", test_case.name);
+            test_case_fn = test_case.test_case_fn;
+            test_case_fn();
+            printf("\n");
+        }
+    }
+
+    err = run_all_test_cases_inner();
+    if (err != null) {
+        printf("Integration tests failed\n");
+        print_err(err);
+        return;
+    } 
+    printf("Test cases passed!\n");
+}
+
+function tree_node_iterator() {
+
+    root = new TreeNode<int>();
+    root.value = 1;
+    add_left_child(root, 2);
+    add_right_child(root, 3);
+    
+    tree_inorder_iterator = new tree_inorder_iterator<int>();
+    init_iterator(tree_inorder_iterator, root);
+
+    excpected = new int[3];
+    excpected[0] = 2;
+    excpected[1] = 1;
+    excpected[2] = 3;
+
+    index=0;
+    for {
+        if (has_next(tree_inorder_iterator)) {
+            value = next(tree_inorder_iterator); 
+            printf("value expected [%d] got [%d]\n", excpected[index], value);
+            index++;
+        } else {
+            break;
+        }
+    }
+    printf("expected index to be [3] got [%d]\n", index);
+}
+
+function push_min_stack_test() throws  {
+
+    stack = new stack<MinNode>();  
+    init_stack(stack);
+
+    push_min_stack(stack, 1);
+    push_min_stack(stack, 2);
+    push_min_stack(stack, 3);
+    push_min_stack(stack, 4);
+    push_min_stack(stack, 5);
+    push_min_stack(stack, 6);
+    push_min_stack(stack, 0);
+
+    result = get_min_stack(stack); 
+
+    if (result != 0) {
+        throw error("min stack expected result incorrect");
+    }
+    printf("result should be 0 got %d\n", result);
+    pop(stack);
+    result = get_min_stack(stack); 
+
+    if (result != 1) {
+        throw error("min stack expected result incorrect");
+    }
+    printf("result should be 1 got %d\n", result);
+}
+
+function eval_reverse_polish_test() throws  {
+    strings = new char[5][1];
+    strings[0][0] = '1';
+    strings[1][0] = '2';
+    strings[2][0] = '*';
+    strings[3][0] = '3';
+    strings[4][0] = '+';
+
+    result = try eval_reverse_polish_notiation(strings);
+
+    if (result != 5) {
+        throw error("evalt reverse polish should be 5 but got some other value");
+    }
+    printf("result should be 5 got %d\n", result);
+}
+
+function run_collection_demo() {
+    printf("\n stack demo\n");
+    stack_demo(10);
+    printf("\n list demo\n");
+    array_list_demo();
+    printf("\n queue demo\n");
+    queue_demo();
+}
+
+function run_tree_traversal_print() {
+    tree_node = new TreeNode<int>();
+    tree_node.value = 3;
+    child = add_right_child(tree_node, 5);
+    add_left_child(child, 10);
+    add_left_child(tree_node, 1);
+    print_tree_node(tree_node);
+
+    printf("\n");
+}
+
+function run_increase_order_search_tree() {
+
+    tree_node = new TreeNode<int>();
+    tree_node.value = 3;
+    child = add_right_child(tree_node, 5);
+    add_left_child(child, 10);
+    add_left_child(tree_node, 1);
+
+    output = increase_order_search_tree(tree_node);
+
+    current_node = output;
+    for {
+        if (current_node == null) {
+            break;
+        }
+        printf("%d,", current_node.value);
+        current_node = current_node.right;
+    }
+}
+
+function run_flatter_tree_to_linked_list() {
+
+    tree_node = new TreeNode<int>();
+    tree_node.value = 3;
+    child = add_right_child(tree_node, 5);
+    add_left_child(child, 10);
+    add_left_child(tree_node, 1);
+
+    flatter_tree_to_linked_list(tree_node);
+
+}
+
+function test_multi_dimension() throws {
+    expected_num_elements = 27;
+    ints = new int[3][3][3];
+    ints[0][0][0] = 10;
+    ints[1][1][1] = 11;
+    num_elements = 0;
+    for (i = 0; i < ints.len; i++) {
+        sub = ints[i];
+        j_len = sub.len;
+        for (j = 0; j < j_len; j++) {
+            sub_sub = ints[i][j];
+            z_len = sub_sub.len;
+            for (z = 0; z < z_len; z++) {
+                num_elements++;
+                printf(" [%d] ", ints[i][j][z]);
+            }
+            printf("\n");
+        }
+    }
+    printf("-----\n");
+
+    if (num_elements != expected_num_elements) {
+        throw error("num elements does not match expected");
+    }
+
+    printf("The number of elemets should be %d\n", expected_num_elements);
+    printf("num of elements is  %d\n", num_elements);
+}
+
+function remove_duplicates_test_but_no_correct_solution() {
+    str = new char[8];
+    
+    // cbacdcbc
+    str[0] = 'c';
+    str[1] = 'b';
+    str[2] = 'a';
+    str[3] = 'c';
+    str[4] = 'd';
+    str[5] = 'c';
+    str[6] = 'b';
+    str[7] = 'c';
+
+    remove_duplicate_letters(str);
+}

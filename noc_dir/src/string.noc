@@ -1,0 +1,41 @@
+// DO NOT TOUCH THIS FILE OR YOU WILL BREAK COMPILER AND RUNTIME
+struct string {
+    char[] value;
+}
+
+// Placeholder for internal structure 
+struct non_native_string {
+
+}
+
+external function string to_native_string(non_native_string non_native);
+
+function int len_of_string(string str) {
+    return str.value.len;
+}
+
+function bool are_str_equal(string first, string second) {
+    if (first.value.len != second.value.len) {
+        return false;
+    }
+    str_len = first.value.len;
+    for (i = 0; i < str_len; i++) {
+        if (first.value[i] != second.value[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function byte[] string_to_byte_array(string str) {
+    // Nothing happens here bytes and chars are same thing in the runtime 
+    // The type checker allows this conversion to take place -- it does not generate any code to handle the conversion
+    bytes::byte[] = str.value;
+    return bytes;
+}
+
+function print_byte_array(byte[] arr) {
+    for (i=0; i<arr.len; i++) {
+        printf("%c", arr[i]);
+    }
+}

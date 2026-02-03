@@ -1,0 +1,20 @@
+enum TokenState {
+    READ,
+    WRITE,
+    ZERO,
+    SOME
+}
+
+function test_match(TokenState state) {
+    match state{
+        case READ | WRITE:
+        {
+            printf("This is in case read, write\n");
+        }
+        case WRITE | ZERO:
+        {
+            printf("This is in case WRITE ZERO\n");
+        }
+    }
+}
+

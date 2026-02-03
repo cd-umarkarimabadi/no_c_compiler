@@ -1,0 +1,58 @@
+import "src/error.noc"
+
+struct stack<T> {
+    T[] elements;
+    int top_index;
+}
+
+function init_stack(stack<T> stack) {
+    stack.elements = new T[10];
+    stack.top_index = 0;
+}
+
+function grow(stack<T> stack) {
+    current_len = stack.elements.len;
+    old_elements = stack.elements;
+    stack.elements = new T[current_len * 2];
+    for (i=0; i<old_elements.len; i++) {
+        stack.elements[i] = old_elements[i];
+    }
+}
+
+function T peek(stack<T> stack) {
+    if (is_empty(stack)) {
+        return null;
+    }
+    return stack.elements[stack.top_index];
+}
+
+function T pop(stack<T> stack) {
+    if (is_empty(stack)) {
+        return null;
+    }
+    current_top = stack.top_index;
+    stack.top_index--;
+    to_return = stack.elements[current_top];
+    stack.elements[current_top] = null; // for gc 
+    return to_return;
+}
+
+function push(stack<T> stack, T value) {
+    if (stack.top_index == stack.elements.len - 1) {
+        grow(stack);
+    }
+    stack.top_index++;
+
+    stack.elements[stack.top_index] = value;
+}
+
+function int stack_size(stack<T> stack) {
+    return stack.top_index;
+}
+
+function bool is_empty(stack<T> stack) {
+    if (stack.top_index == 0) {
+        return true;
+    }
+    return false;
+}

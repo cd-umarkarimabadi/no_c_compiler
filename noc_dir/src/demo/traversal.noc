@@ -1,0 +1,70 @@
+import "src/collections/queue.noc"
+
+struct TreeNode<T> {
+    T value;
+    TreeNode<T> left;
+    TreeNode<T> right;
+}
+
+function TreeNode<T> add_left_child(TreeNode<T> parent, T value) {
+    new_node = new TreeNode<T>();
+    new_node.value = value;
+    parent.left = new_node;
+    return new_node;
+}
+
+function TreeNode<T> add_right_child(TreeNode<T> parent, T value) {
+    new_node = new TreeNode<T>();
+    new_node.value = value;
+    parent.right = new_node;
+    return new_node;
+}
+
+function pre_order(TreeNode<T> parent) {
+    if (parent == null) {
+        return;
+    }
+    printf("Node value is %d\n", parent.value);
+    pre_order(parent.left);
+    pre_order(parent.right);
+}
+
+function post_order(TreeNode<T> parent) {
+    if (parent == null) {
+        return;
+    }
+    post_order(parent.left);
+    post_order(parent.right);
+    printf("Node value is %d\n", parent.value);
+}
+
+function print_tree_node(TreeNode<T> root) {
+
+    work_queue = new queue<TreeNode<T>>();
+    init_queue(work_queue);
+    enqueue(work_queue, root);
+    for {
+        if (is_queue_empty(work_queue)) {
+            break;
+        }
+    
+        current_node = dequeue(work_queue);
+        if (current_node == null) {
+            printf("null,");
+            continue;
+        }
+        printf("%d,", current_node.value);
+        enqueue(work_queue, current_node.left);
+        enqueue(work_queue, current_node.right);
+    }
+}
+
+function tree_node_traversal_test() {
+    tree_node = new TreeNode<int>();
+    tree_node.value = 3;
+    child = add_right_child(tree_node, 5);
+    add_left_child(child, 10);
+    add_left_child(tree_node, 1);
+
+    print_tree_node(tree_node);
+}

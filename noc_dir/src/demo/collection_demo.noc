@@ -1,0 +1,74 @@
+import "src/collections/stack.noc"
+import "src/collections/queue.noc"
+import "src/collections/array_list.noc"
+import "src/collections/linked_list.noc"
+
+function stack_demo(int stack_size) {
+    stack = new stack<int>();
+    init_stack(stack);
+    for (i = 0; i < stack_size; i++) {
+        push(stack, i);
+    }
+    index = stack_size - 1;
+    for {
+        if (is_empty(stack)) {
+            break;
+        }
+        top = pop(stack);
+        printf("top value should be %d got %d\n", index, top);
+        index--;
+    }
+}
+
+function array_list_demo() {
+    array_list = new array_list<int>();
+    init_array_list(array_list);
+    array_list_print(array_list);
+    array_list_add(array_list, 1);
+    array_list_add(array_list, 2);
+    array_list_add(array_list, 3);
+    array_list_add(array_list, 4);
+    array_list_add(array_list, 5);
+    array_list_add(array_list, 6);
+    array_list_print(array_list);
+}
+
+function queue_demo() {
+
+    queue = new queue<int>();
+    init_queue(queue);
+    enqueue(queue, 4);
+    enqueue(queue, 5);
+    enqueue(queue, 6);
+
+    index = 4;
+    for {
+        if (is_queue_empty(queue)) {
+            break;
+        }
+        val = dequeue(queue);
+        printf("Val should be %d got %d\n", index, val);
+        index++;
+    }
+
+    printf("Done\n");
+
+}
+
+function linked_list_demo() {
+
+    val = new linked_list<int>();
+    init_linked_list(val);
+    printf("list :: print\n");
+    // append_list(val, 1);
+    // append_list(val, 2);
+    // append_list(val, 3);
+    printf("list :: print\n");
+    print_linked_list(val);
+    printf("Removing two elements from linked list\n");
+    remove_head(val);
+    remove_head(val);
+    printf("list :: print\n");
+    print_linked_list(val);
+
+}

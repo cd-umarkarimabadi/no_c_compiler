@@ -1,0 +1,38 @@
+
+import "src/error.noc"
+import "src/io/socket.noc"
+import "src/io/file.noc"
+
+function socket_demo() throws {
+    // For this demo to work 
+    // python3 simple_http_server.py has to be run 
+    socket = try create_socket();
+    try connect_socket(socket, "127.0.0.1", 8080);
+    printf("connected to server\n");
+    msg = string_to_byte_array("hello server");
+    try write_socket(socket, msg);
+    response = try read_socket(socket, 10);
+    if (response.len == 0) {
+        printf("EOF reached");
+        return;
+    }
+    printf("response should be Hello client got\n");
+    print_byte_array(response);
+}
+
+function file_demo() throws {
+    file = try open_file("test.txt", "r");
+    data = try read_file(file, 30);
+    printf("response should be Hello world from file got\n");
+    print_byte_array(data);
+}
+
+function server_socket_demo() throws {
+    server_socket = try create_server_socket(8080);
+    client_socket = try accept(server_socket);
+    printf("Accepted connetion\n");
+    data = try read_socket(client_socket, 10);
+    print_byte_array(data);
+    msg = string_to_byte_array("hello from server");
+    try write_socket(client_socket, msg);
+}

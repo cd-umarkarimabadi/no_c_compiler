@@ -1,0 +1,16 @@
+// DO NOT TOUCH THIS FILE OR YOU WILL BREAK COMPILER AND RUNTIME
+import "src/string.noc"
+
+struct err {
+    string err_msg;
+}
+
+function err error(string msg) {
+    err = new err();
+    err.err_msg = msg;
+    return err;
+}
+
+function print_err(err err) {
+    printf("The error message is ::  %s\n", err.err_msg);
+}

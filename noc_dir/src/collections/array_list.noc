@@ -1,0 +1,54 @@
+import "src/error.noc"
+
+struct array_list<T> {
+    T[] arr;
+    int num_elements;
+}
+
+function init_array_list(array_list<T> list) {
+    list.arr = new T[10];
+    list.num_elements = 0;
+}
+
+function array_list_add_at_index(array_list<T> list, T value, int index) throws {
+    if (index < 0 || index >= list.arr.len) {
+        throw error("array_list add is attempting to add in an unsafe index");
+    }
+    list.arr[index] = value;
+}
+
+function T array_list_at(array_list<T> list, int index) throws {
+    if (index < 0 || index >= list.arr.len) {
+        throw error("array_list add is attempting to retrieve from an unsafe index");
+    }
+    val = list.arr[index];
+    return val;
+}
+
+function int size_of_array_list(array_list<T> list) {
+    return list.num_elements;
+}
+
+function array_list_grow(array_list<T> list) {
+    current_len = list.arr.len;
+    old_elements = list.arr;
+    list.arr = new T[current_len * 2];
+    for (i=0; i<old_elements.len; i++) {
+        list.arr[i] = old_elements[i];
+    }
+}
+
+function array_list_add(array_list<T> list, T element) {
+    if (list.num_elements == list.arr.len) {
+        array_list_grow(list);
+    }
+    list.arr[list.num_elements] = element;
+    list.num_elements++;
+}
+
+function array_list_print(array_list<T> list) {
+    for(i=0; i<list.arr.len; i++) {
+        printf("%d,", list.arr[i]);
+    }
+    printf("\n");
+}
